@@ -1,0 +1,55 @@
+* {
+    margin: 0px;
+}
+.icon {
+    padding: 10px;
+    background: #57b846;
+    color: white;
+    min-width: 50px;
+    text-align: center;
+    border-radius:50px;
+    font-size: 21px;
+}
+.form-group{
+    display: -ms-flexbox; /* IE10 */
+    display: flex;
+    padding: 5px;
+}
+.form-control {
+    border : 2px solid  #57b846;
+    border-radius:25px;
+}
+.reglog {
+    margin-top: 50px;
+    padding: 20px;
+    overflow: auto;
+    border: 5px solid whitesmoke;
+}
+.btn{
+    background-color: white;
+    color: black;
+}
+
+.table {
+    overflow:auto;
+}
+
+.modal-body {
+    margin: 10px;
+}
+.field_icon {
+    float: right;
+    margin-left: -25px;
+    margin-top: -30px;
+    margin-right: 10px;
+    position: relative;
+    z-index: 1;
+    color: #57b846;
+}
+.userName {
+    float:right;
+    font-size:30px;
+    overflow:hidden;
+    margin-top:25px;
+    margin-left: 10px;
+}

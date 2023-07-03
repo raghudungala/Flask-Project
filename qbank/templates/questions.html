@@ -1,0 +1,195 @@
+<table class="table text-center reglog">
+  <thead>
+    <tr>
+      <th><input type="checkbox" name="select_all" onchange="selectAll()" id="select_all" autocomplete="off" /></th>
+      <th>QUESTION</th>
+      <th>QUESTION_TYPE</th>
+      <th>WEIGHTAGE</th>
+      <th colspan="2">ACTIONS</th>
+  </thead>
+  <tbody>
+    {% for question in questions %}
+    <tr id='{{question.id}}' class="tableRows">
+      <td>
+        <input type="checkbox" class="checkbox" onchange="selectCheckbox()" name="fancy-checkbox-success"
+          autocomplete="off" />
+      </td>
+      <td>{{question.summary}}</td>
+      <td>
+        {% for qtypes in qtypes %}
+        {% if question.qtype_id == qtypes.id %}
+        {{qtypes.name}}
+        {% endif %}
+        {% endfor %}
+      </td>
+      <td>{{question.weightage}}</td>
+      <td>
+        <a action="{{ url_for('application.question',id=question.id) }}" class="modalpopup btn btn-primary"
+          data-toggle="modal" href="#exampleModal" data-id={{question.id}}>
+          Show
+          <span>
+            <i class="fa fa-eye"></i>
+          </span>
+        </a>
+        <button class="btn btn-success editQuestion" data-toggle="modal" question-id="{{question.id}}"
+          action="{{ url_for('application.question',id=question.id) }}" id="editQuestion{{question.id}}"
+          href="#editQuestion">Edit
+          <span>
+            <i class="fa fa-edit"></i>
+          </span></button>
+        <button class="btn btn-danger delete" action="{{ url_for('author.delete',id=question.id) }}" class="delete"
+          id="deleteQuestion{{question.id}}" data-confirm="Are you sure you want to delete?">Delete
+          <span>
+            <i class="fa fa-trash"></i>
+          </span>
+        </button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Question Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="editQuestion" tabindex="-1" role="dialog" aria-labelledby="editQuestionLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Update Question</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".delete").click(function () {
+      $.ajax({
+        type: "DELETE",
+        url: $(this).attr("action"),
+        success: function (data) {
+          $("tr#" + data.id).remove();
+          flashMessage(data);  
+        },
+        error: function (error) {
+          $(".get_section").show().html(error);
+        }
+      })
+    })
+
+    function onChangeDrop() {
+      var selectedCategory = $('#category_list').val();
+      debugger;
+      var skill_list = $('#skill_list');
+      $("#skill_list").empty();
+      debugger;
+      {% for skill in skills %}
+      if (selectedCategory == '{{skill.category_id}}') {
+        var option = document.createElement("option");
+        option.text = '{{skill.name}}'
+        option.value = '{{skill.id}}'
+        skill_list.add(option)
+      }
+      {% endfor %}
+      skill_list.selectedIndex = 0
+    }
+
+    function flashMessage(data) {
+      $("#flashmessage").html('<div class="container alert alert-' + (data.hasOwnProperty("success") ? "success" : "danger") + ' alert-dismissible fade show">' + data.message + '<button type="button" class="close" data-dismiss="alert">&times;</button>  </div>');
+    }
+  })
+  var select_all = document.getElementById("select_all")
+  var checkbox = document.getElementsByName("fancy-checkbox-success")
+  var table_rows = document.getElementsByClassName("tableRows")
+  function selectAll() {
+
+    for (i = 0; i <= checkbox.length - 1; i++) {
+      if (select_all.checked == true) {
+        checkbox[i].checked = true;
+        table_rows[i].classList.add("selected");
+      }
+      else if (select_all.checked != true) {
+        checkbox[i].checked = false;
+        table_rows[i].classList.remove("selected");
+      }
+    }
+  }
+
+  function selectCheckbox() {
+    var count = 0;
+    for (i = 0; i <= checkbox.length - 1; i++) {
+      if (checkbox[i].checked == true) {
+        table_rows[i].classList.add("selected");
+        count = count + 1
+      }
+
+      if (checkbox[i].checked == false) {
+        table_rows[i].classList.remove("selected");
+        count = count - 1
+      }
+    }
+    if (count == checkbox.length) {
+      select_all.checked = true
+    }
+    else if (count < checkbox.length) {
+      select_all.checked = false
+    }
+  }
+
+  {% for question in questions %}
+  if ("{{current_user.role.name}}" == "admin" || "{{current_user.id}}" == "{{question.author}}") {
+    $('#editQuestion{{question.id}}').removeAttr('disabled');
+    $('#deleteQuestion{{question.id}}').removeAttr('disabled');
+  }
+  else {
+    $('#editQuestion{{question.id}}').attr('disabled', 'disabled');
+    $('#deleteQuestion{{question.id}}').attr('disabled', 'disabled');
+  }
+  {% endfor %}
+  $('.modal-dialog').draggable();   
+
+</script>
+<style>
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    text-align: center;
+  }
+
+  tr:nth-child(even) {
+    background-color: rgb(15, 230, 238);
+  }
+
+  .selected:nth-child(even),
+  .selected:nth-child(odd) {
+    background-color: #57b846;
+    color: white;
+  }
+
+  .checkbox {
+    border-radius: 12px
+  }
+</style>
+</script>

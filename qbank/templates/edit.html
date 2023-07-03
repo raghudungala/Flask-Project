@@ -1,0 +1,33 @@
+<form id="editquestion" >
+    {% include "form.html" %} 
+    
+</form>
+<center>
+    <button type="submit" action="{{ url_for('author.update',id=question.id) }}" class="update btn btn-success">Update</button>
+</center>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".update").click(function () {
+            var form = $("form#editquestion");
+            $.ajax({
+                type: "PUT",
+                url: $(this).attr("action"),
+                // data: JSON.stringify(data),
+                url: $(this).attr("action") + "?description=" + form.find("[name=description]").val() + "&weightage=" + form.find("[name=weightage]").val() + "&qtype_id=" + form.find("[name=qtype_id]").val() + "&category_id=" + form.find("[name=cid]").val() + "&skill_id=" + form.find("[name=sid]").val() + "&summary=" + form.find("[name=summary]").val(),
+                success: function (data) {
+                    
+                    $("button.close").trigger("click");
+                    flashMessage(data);
+                },
+                error: function (error) {
+                    $(".get_section").show().html(error);
+                }
+            })
+        })
+        function flashMessage(data) {
+            $("#flashmessage").html('<div class="container alert alert-' + (data.hasOwnProperty("success") ? "success" : "danger") + ' alert-dismissible fade show">' + data.message + '<button type="button" class="close" data-dismiss="alert">&times;</button> </div>');
+        }
+    })
+</script>

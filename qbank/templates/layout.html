@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Question Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="static/css/application.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/reglog.css') }}">
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="static/js/application.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
+
+  
+
+
+  <style>
+    a:hover {
+      text-decoration: none
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        {% if not role %}
+        <li class="nav-item">
+          <a class="nav-link" href="/login" style="color:white">Login<span>
+              <i class="fa fa-sign-in"></i>
+            </span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/" style="color:white">Contact Us<span>
+              <i class="fa fa-phone"></i>
+            </span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/" style="color:white">About Us<span>
+              <!-- <i class="fa fa-user-plus"></i> -->
+            </span></a>
+        </li>
+        {% endif %}
+        {% if role == 'admin' %}
+        <li class="nav-item active">
+          <a class="nav-link" href="/admin" style="color:white">Home<span>
+              <i class="fa fa-home"></i>
+            </span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/{{role}}/users" style="color:white">Users<span>
+              <i class="fa fa-users"></i>
+            </span></a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/logout" style="color:white">LogOut<span>
+              <i class="fa fa-sign-out"></i>
+            </span></a>
+        </li>
+        {% elif role == 'author' or role == 'viewer' %}
+        <li class="nav-item active">
+          <a class="nav-link" href="/author" style="color:white">Home<span>
+              <i class="fa fa-home"></i>
+            </span></a>
+        </li>
+       
+        <li class="nav-item">
+          <a class="nav-link" href="/logout" style="color:white">LogOut<span>
+              <i class="fa fa-sign-out"></i>
+            </span></a>
+        </li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="nav-item">
+          <a class="nav-link" href="/{{role}}/profile" style="color:white">
+            <i class="fa fa-user-circle-o" style="font-size:24px"></i>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" id="date" style="color:white"></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div id="flashmessage" style="text-align:center"></div>
+  {% include "message.html" %}
+  {% block content %}
+  {% endblock %}
+</body>
+<script>
+  window.onload = function () { getTime(); }
+  function getTime() {
+    var today = new Date();
+    var date = today.getDate();
+    var year = today.getFullYear();
+    var hours = today.getHours();
+    var minutes = today.getMinutes();
+    var seconds = today.getSeconds();
+    var days = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"];
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var current_month = months[today.getMonth()];
+    var current_day = days[today.getDay()];
+    minutes = checkTime(minutes);
+    seconds = checkTime(seconds);
+    document.getElementById('date').innerHTML = current_day + " " + date + "/" + current_month + "/" + year + "  " +
+      hours + ":" + minutes + ":" + seconds;
+    setTimeout(function () { getTime() }, 1000);
+  }
+  function checkTime(i) {
+    if (i < 10) {
+      i = "0" + i;
+    }
+    return i;
+  }
+  $(document).ready(function () {
+    $(".resetPassword").click(function () {
+      var form = $("form#resetPassword");
+      $.ajax({
+        type: "PUT",
+        url: $(this).attr("action"),
+        url: $(this).attr("action") + "?oldPassword=" + form.find("[name=oldPassword]").val() + "&newPassword=" + form.find("[name=newPassword]").val(),
+        success: function (data) {
+          $("button.close").trigger("click");
+          flashMessage(data);
+          setTimeOut(function () { window.location.reload(); }, 1000)
+        },
+        error: function (error) {
+          $(".get_section").show().html(error);
+        }
+      })
+    })
+    function flashMessage(data) {
+      $("#flashmessage").html('<div class="container alert alert-' + (data.hasOwnProperty("success") ? "success" : "danger") + ' alert-dismissible fade show">' + data.message + '<button type="button" class="close" data-dismiss="alert">&times;</button>  </div>');
+    }
+  })
+</script>
+
+</html>

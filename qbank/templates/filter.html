@@ -1,0 +1,113 @@
+<div class="container">
+  <div class="row" style='margin-top: 60px'></div>
+
+  <div class="row" style='margin-top: 30px'>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+      <form id="filter" method="POST">
+        <div class="row">
+          <div class="col-sm-3">
+            <select class="form-control" required="true" name="category_list" id="category_list"
+              onchange="onChangeDrop()">
+              <option hidden="true">Category</option>
+              {% for cat in category %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-sm-3">
+            <select class="form-control" onchange="onChangeSkill()" required="true" name="skill_list" id="skill_list">
+              <option hidden="true">Skill</option>
+            </select>
+          </div>
+
+          <div class="col-sm-3">
+            <select class="form-control" onchange="onChangeQType()" name="qtype" id="qtype_id">
+              <option>All</option>
+              {% for item in qtypes %}
+              <option value="{{ item.id }}">{{ item.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-sm-3">
+            <select multiple class="form-control" onchange="onChangeWeightage()" name="weightage[]"
+              id="weightage_id">
+              <option>All</option>
+              {% for n in range(1, 11) %}
+              <option value="{{ n }}">{{ n }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-sm-2"></div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+      <div class="row">
+        <div class="col-sm-2">
+          <button class="btn btn-success" id="questions" action="{{ url_for('application.questions') }}">Get</button>
+        </div>
+        {% if role == 'admin' or role == 'author' %}
+        <div class="col-sm-2">
+          <a class="btn btn-success" data-toggle="modal" href="#addQuestion" onclick="getFilter()">Add</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-sm-2"></div>
+  </div>
+
+  <br><br>
+  
+  <div class="get_section"></div>
+
+
+  <script type="text/javascript">
+    function onChangeDrop() {
+      var selectedCategory = $('#category_list').val();
+      var categoryId = document.getElementById('category_list');
+      var category = categoryId.options[categoryId.selectedIndex].value
+      localStorage.setItem('category', category)
+
+      var skill_list = document.getElementById('skill_list');
+      $("#skill_list").empty();
+      {% for skill in skills %}
+      if (selectedCategory == '{{skill.category_id}}') {
+        var option = document.createElement("option");
+        option.text = '{{skill.name}}'
+        option.value = '{{skill.id}}'
+        skill_list.add(option)
+      }
+      {% endfor %}
+      skill_list.selectedIndex = 0
+      var skill = document.getElementById('skill_list').options[skill_list.selectedIndex].value;
+      localStorage.setItem('skill', skill)
+
+    }
+
+    function onChangeSkill() {
+      var skill = document.getElementById('skill_list').options[skill_list.selectedIndex].value;
+      localStorage.setItem('skill', skill)
+    }
+
+    function onChangeQType() {
+      var qtype = document.getElementById('qtype_id').options[qtype_id.selectedIndex].value;
+      localStorage.setItem('qtype', qtype)
+    }
+
+    function onChangeWeightage() {
+      var weightage = document.getElementById('weightage_id').options[weightage_id.selectedIndex].value;
+      localStorage.setItem('weightage', weightage)
+    }
+
+    $(document).ready(function () {
+      localStorage.clear();
+    })
+  </script>
+</div>

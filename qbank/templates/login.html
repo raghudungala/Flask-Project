@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+	<div class="col-sm-4"></div>
+	<div class="col-sm-4 reglog">
+		<form action="" method="POST">
+			<h3 style="text-align: center;color: black;overflow: hidden">Login Form</h3>
+			<div class="form-group">
+				<i class="fa fa-envelope icon"></i>
+				<input type="text" name="email" placeholder="Email Address" class="form-control" required />
+			</div>
+			<div class="form-group">
+				<i class="fa fa-lock icon"></i>
+				<input type="password" name="password" placeholder="Password" id="pass-log-id" class="form-control" required>
+				<span toggle="#password-field" class="fa fa-eye field_icon toggle-password"></span></input>
+			</div>
+			<div class="form-button">
+				<button class="btn btn-success"><a>LOGIN</a></button>
+				<button class="btn btn-danger"><a>CANCEL</a></button>
+			</div>
+		</form>
+	</div>
+	<div class="col-sm-4"></div>
+</div>
+{% endblock %}

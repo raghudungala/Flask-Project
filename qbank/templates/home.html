@@ -1,0 +1,204 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="container">
+            {% include "filter.html" %}<span>
+        </div>
+    </div><br>
+</div>
+
+<div class="modal fade" id="addQuestion" tabindex="-1" role="dialog" aria-labelledby="addQuestionLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Question</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addquestion" method="POST">
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">User Id</label>
+                        <div class="col-sm-8"><input class="form-control" type="text" name="user_id" readonly="true"
+                                value="{{current_user.id}}"></div>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">Summary</label>
+                        <div class="col-sm-8"><input class="form-control" type="text" name="summary"></div>
+                    </div>
+
+
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">Category</label>
+                        <select class="col-sm-8 form-control" required="true" name="cid" id="c_list"
+                            onchange="onChangeDropFromPopUp()">
+                            <option hidden="true" value="" id="category"></option>
+                            {% for cat in category %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">Skill</label>
+                        <select class="col-sm-8 form-control" required="true" name="sid" id="s_list">
+                            <option hidden="true" value="" id="skill"></option>
+                        </select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">Qtype</label>
+                        <select class="col-sm-8 form-control" required="true" name="qtype_id" id="qtype_list">
+                            <option hidden="true" value="" id="qtype">--Select Qtype--</option>
+                            {% for item in qtypes %}
+                            <option value="{{ item.id }}">{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">Description</label>
+                        <div class="col-sm-8"><input class="form-control" type="text" name="description"></div>
+                    </div>
+
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-form-label">Weightage</label>
+                        <select class="col-sm-8 form-control" name="weightage">
+                            <option hidden="true" value="" id="weightage"></option>
+                            {% for n in range(1,11) %}
+                            <option value="{{ n }}">{{ n }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+
+                </form>
+                <center>
+                    <button class="create btn btn-success"
+                        action="{{ url_for('author.add_questions') }}">Create</button>
+                </center>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function onChangeDropFromPopUp() {
+
+        var selectedCategory = $('#c_list').val();
+        var skill_list = document.getElementById('s_list');
+        $("#s_list").empty();
+        {% for skill in skills %}
+        if (selectedCategory == '{{skill.category_id}}') {
+            var option = document.createElement("option");
+            option.text = '{{skill.name}}'
+            option.value = '{{skill.id}}'
+            skill_list.add(option)
+        }
+        {% endfor %}
+        skill_list.selectedIndex = 0
+    }
+
+
+    var categories = {}
+    {% for cat in category %}
+    categoryList = {
+        "{{cat.name}}": {{ cat.id }}
+        }
+    $.extend(categories, categoryList)
+    {% endfor %}
+
+    var skills = {}
+    {% for skills in skills %}
+    skillList = {
+        "{{skills.name}}": {{ skills.id }}
+        }
+    $.extend(skills, skillList)
+    {% endfor %}
+
+    var qtype = {}
+    {% for qtype in qtypes %}
+    qtypeList = {
+        "{{qtype.name}}": {{ qtype.id }}
+        }
+    $.extend(qtype, qtypeList)
+    {% endfor %}
+
+    function getFilter() {
+        const categoryKeys = Object.keys(categories);
+        const categoryValues = Object.values(categories);
+
+        const skillKeys = Object.keys(skills);
+        const skillValues = Object.values(skills);
+
+        const qtypeKeys = Object.keys(qtype);
+        const qtypeValues = Object.values(qtype);
+
+        if (localStorage.getItem('category') == null) {
+            document.getElementById('category').innerHTML = "Category";
+        }
+        else {
+            var selectedCategory = localStorage.getItem("category");
+            for (var i = 0; i < categoryValues.length; i++) {
+                if (categoryValues[i] == selectedCategory) {
+                    document.getElementById('category').innerHTML = categoryKeys[i];
+                }
+            }
+            var set = document.getElementById('category')
+            if (set.hasAttribute('value')) {
+                var catValue = localStorage.getItem('category')
+                set.setAttribute("value", catValue);
+            }
+        }
+        if (localStorage.getItem('skill') == null) {
+            document.getElementById('skill').innerHTML = "Skill";
+        }
+        else {
+            var selectedSkill = localStorage.getItem("skill");
+            for (var i = 0; i < skillValues.length; i++) {
+                if (skillValues[i] == selectedSkill) {
+                    document.getElementById('skill').innerHTML = skillKeys[i];
+                }
+            }
+            var set = document.getElementById('skill')
+            if (set.hasAttribute('value')) {
+                var skillValue = localStorage.getItem('skill')
+                var valueSet = set.setAttribute("value", skillValue);
+            }
+        }
+        if (localStorage.getItem('qtype') == null) {
+            document.getElementById('qtype').innerHTML = "--Select Qtype--";
+        }
+        else {
+            var selectedQType = localStorage.getItem("qtype");
+            for (var i = 0; i < qtypeValues.length; i++) {
+                if (qtypeValues[i] == selectedQType) {
+                    document.getElementById('qtype').innerHTML = qtypeKeys[i];
+                }
+            }
+            var set = document.getElementById('qtype')
+            if (set.hasAttribute('value')) {
+                var catValue = localStorage.getItem('qtype')
+                var valueSet = set.setAttribute("value", catValue);
+            }
+        }
+        if (localStorage.getItem('weightage') == null) {
+            document.getElementById('weightage').innerHTML = "--Select Weightage--";
+        }
+        else {
+            document.getElementById('weightage').innerHTML = localStorage.getItem("weightage");
+            var set = document.getElementById('weightage')
+            if (set.hasAttribute('value')) {
+                var catValue = localStorage.getItem('weightage')
+                var valueSet = set.setAttribute("value", catValue);
+            }
+        }
+    }
+    $('.modal-dialog').draggable();
+</script>
+{% endblock %}

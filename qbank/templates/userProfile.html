@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    a:hover {
+        text-decoration: none
+    }
+</style>
+
+<body>
+    <div class="row" style="margin-top:30px"></div>
+    <center>
+    </center>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+
+            </div>
+            {% for data in users %}
+            {% if role == data[1].name and current_user.id == data[0].id %}
+            <div class="col-sm-6">
+                <i class="fa fa-user-circle-o" style="font-size:80px"><span>
+                        <p class="userName">Hi, {{current_user.name}}</p>
+                    </span></i>
+                <div class="row form-group">
+                    <label class="col-sm-3 col-form-label">User_ID</label>
+                    <div class="col-sm-8"><input class="form-control" type="text" name="id" readonly="true"
+                            value="{{ data[0].id }}"></div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-sm-3 col-form-label">Username</label>
+                    <div class="col-sm-8"><input class="form-control" type="text" name="username" readonly="true"
+                            value="{{ data[0].name }}"></div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-sm-3 col-form-label">Email_ID</label>
+                    <div class="col-sm-8"><input class="form-control" type="email" name="email" readonly="true"
+                            value="{{ data[0].email }}"></div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-sm-3 col-form-label">Role</label>
+                    <div class="col-sm-8"><input class="form-control" type="text" name="email" readonly="true"
+                            value="{{ data[1].name }}"></div>
+                </div>
+                <center>
+                    <a class="btn btn-success resetPassword" data-toggle="modal" href="#resetPassword">Reset Password<span>
+                            <i class="fa fa-undo"></i>
+                        </span></a>
+                </center>
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div class="col-sm-3"></div>
+        </div>
+        <div class="modal fade" id="resetPassword" tabindex="-1" role="dialog" aria-labelledby="resetPasswordTitle"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="resetPasswordTitle">Reset Password</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="resetPassword" method="POST">
+                            <div class="row form-group">
+                                <label class="col-sm-3 col-form-label">User_ID</label>
+                                <div class="col-sm-8"><input class="form-control" type="text" name="id" value="{{current_user.id}}" readonly="true">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-sm-3 col-form-label">Old Password</label>
+                                <div class="col-sm-8"><input class="form-control" type="password" name="oldPassword" id="pass_log_id"><span toggle="#password-field"
+                                    class="fa fa-fw fa-eye field_icon toggle-password"></span></input>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-sm-3 col-form-label">New Password</label>
+                                <div class="col-sm-8"><input class="form-control" type="password" name="newPassword" id="confirm_pass_log_id"><span toggle="#password-field"
+                                    class="fa fa-fw fa-eye field_icon toggle-confirmpassword"></span></input>
+                                </div>
+                            </div>
+                        </form>
+                        <center>
+                            <button class="resetPassword btn btn-success"
+                                action="{{ url_for('author.resetPassword',username=current_user.name) }}">
+                                Reset
+                            </button>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+<script type="text/javascript">
+
+    $(document).on('click', '.toggle-password', function () {
+        $(this).toggleClass("fa-eye fa-eye-slash");
+        var input = $("#pass_log_id");
+        if (input.attr("type") === "password") {
+            input.attr("type", "text");
+        } else {
+            input.attr("type", "password");
+        }
+
+    });
+
+    $(document).on('click', '.toggle-confirmpassword', function () {
+        $(this).toggleClass("fa-eye fa-eye-slash");
+        var input = $("#confirm_pass_log_id");
+        if (input.attr("type") === "password") {
+            input.attr("type", "text");
+        } else {
+            input.attr("type", "password");
+        }
+    });
+
+    $('.modal-dialog').draggable();
+
+</script>
+{% endblock %}
